@@ -1,0 +1,322 @@
+\documentclass[10pt,aspectratio=169]{beamer}
+\usetheme{Madrid}
+\usecolortheme{whale}
+
+% --- Core System Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{mathpazo}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+% --- Tailored Corporate Color Palette ---
+\definecolor{navyblue}{RGB}{15, 23, 42}
+\definecolor{tealaccent}{RGB}{13, 148, 136}
+\definecolor{lightbg}{RGB}{248, 250, 252}
+\definecolor{charcoal}{RGB}{30, 41, 59}
+
+\setbeamercolor{palette primary}{bg=navyblue, fg=white}
+\setbeamercolor{palette secondary}{bg=navyblue!85, fg=white}
+\setbeamercolor{palette tertiary}{bg=navyblue!70, fg=white}
+\setbeamercolor{structure}{fg=navyblue}
+\setbeamercolor{titlelike}{parent=palette primary}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=charcoal}
+
+\setbeamercolor{block title}{bg=navyblue, fg=white}
+\setbeamercolor{block body}{bg=lightbg, fg=charcoal}
+\setbeamercolor{block title example}{bg=tealaccent, fg=white}
+\setbeamercolor{block body example}{bg=lightbg, fg=charcoal}
+
+\setbeamerfont{title}{size=\Large, series=\bfseries}
+\setbeamerfont{frametitle}{size=\large, series=\bfseries}
+\setbeamertemplate{navigation symbols}{}
+
+% --- Footer Customization ---
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{palette primary}%
+    Strategic Marketing Presentation
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{palette secondary}%
+    100k Customer Profile Analysis
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{palette tertiary}%
+    \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+  \end{beamercolorbox}}%
+  \vspace*{0pt}%
+}
+
+\title[Data-Driven Retention Architecture]{From Churn to Value: An Advanced Predictive Customer Retention Strategy}
+\subtitle{Data-Driven Insights and XGBoost Modeling over 100,000 Wireless Profiles}
+\author{Data Analysis \& Marketing }
+\date{June 2026}
+
+\begin{document}
+
+% Slide 1: Title
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% Slide 2: Introduction & Corporate Framing
+\begin{frame}{1. Introduction \& Corporate Framing}
+  \begin{itemize}
+    \item \textbf{The Data Domain:} Historical records of \textbf{100,000 active users} across 100 base indicators.
+    \item \textbf{The Core Strategic Question:} 
+    \begin{center}
+      \alert{\textbf{``How can Company A structurally prevent high-value revenue attrition by capturing usage degradation trends before reaching critical breakdown thresholds?''}}
+    \end{center}
+    \item \textbf{The Analysis Pivot:} Base revenues (\texttt{rev\_Mean}) are deceptive (Retained: \$59.22 vs. Churned: \$58.21). Retention infrastructure must monitor \textbf{dynamic behavior variation}, not static billing.
+  \end{itemize}
+\end{frame}
+
+% Slide 3: Data Architecture & Missingness
+\begin{frame}{2. Data Architecture \& Missingness Resolution}
+  \begin{columns}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Sparsity Resolution Summary}
+        \begin{itemize}
+          \item \textbf{\texttt{numbcars}} shows extreme missingness near 50,000 records; completely evicted to prevent bias.
+          \item Demographics like \textbf{\texttt{dwllsize}}, \textbf{\texttt{HHstatin}}, and \textbf{\texttt{ownrent}} exhibit heavy missing blocks; structurally mapped to an explicit \textbf{`Unknown`} category.
+          \item Technical attributes like \textbf{\texttt{lor}} imputed cleanly using distribution medians.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63ff2b.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 4: Behavioral Deep Dive (Usage Decline)
+\begin{frame}{3. Behavioral Trajectory: Silent Usage Compression}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Behavior Shift Analysis}
+        The dynamic continuous matrix \textbf{\texttt{change\_mou}} reveals a severe, progressive customer decoupling:
+        \begin{itemize}
+          \item \textbf{Retained Base ($\text{Churn}=0$):} Marginal continuous mean contraction of \textbf{$-5.34$ minutes}.
+          \item \textbf{Churned Base ($\text{Churn}=1$):} Drastic drop averaging \alert{\textbf{$-22.76$ minutes}} (Over 425\% drop).
+        \end{itemize}
+        The ``Strong Decline'' group exhibits the highest overall churn density.
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63feb5.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 5: Advanced Insight I - Bill Shock Matrix
+\begin{frame}{4. Advanced Insight I: The Dynamics of Bill Shock}
+  \begin{columns}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Revenue Variance Analysis (\texttt{change\_rev})}
+        \begin{itemize}
+          \item Sudden price fluctuations induce immediate user attrition.
+          \item \textbf{Massive Drops:} High churn (\textbf{52.17\%}) indicates reactive scaling down before defection.
+          \item \textbf{Bill Shock ($> \$20$ Extra):} Attrition probability jumps sharply to \alert{\textbf{51.42\%}} due to out-of-bundle surprises.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63e089.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 6: Advanced Insight II - Network Quality Friction
+\begin{frame}{5. Advanced Insight II: Network Quality \& Call Completion}
+  \begin{block}{Connecting Technical Performance to Commercial Defection}
+    \begin{itemize}
+      \item Analytical tracking of \textbf{\texttt{call\_completion\_rate}} exposes technical breaking points:
+      \begin{itemize}
+        \item Retained Subscribers ($\text{Churn}=0$): Maintain a healthy average completion rate of \textbf{0.7068}.
+        \item Churned Subscribers ($\text{Churn}=1$): Drop significantly to a compressed mean of \textbf{0.6794}.
+      \end{itemize}
+      \item Customers enduring high call drops or blockages (\textbf{Critical Issues Tier}) show an elevated baseline churn probability of \alert{\textbf{53.97\%}}, whereas the \textbf{Excellent Quality Tier} sits safely at \textbf{47.47\%}.
+    \end{itemize}
+  \end{block}
+  \begin{exampleblock}{The Business Warning}
+    Technical quality drop-offs trigger behavioral silent churn. Subscribers face structural dropped calls, decrease usage, and quietly leave without communicating.
+  \end{exampleblock}
+\end{frame}
+
+% Slide 7: Advanced Insight III - Network Quality Drop Matrix
+\begin{frame}{6. Advanced Insight III: Infrastructure Degradation Analysis}
+  \begin{columns}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Overlaying Technical Errors and Volume Changes}
+        \begin{itemize}
+          \item This multi-dimensional layer charts total call drop failures (\texttt{failed\_calls\_tier}) against the dynamic volume evolution (\texttt{change\_mou}).
+          \item Data confirms that as technical friction scales up to the \textbf{``High Friction''} quadrant, churned users violently contract their voice/data volume down past \textbf{$-55$ minutes}.
+          \item This proves that infrastructure failure is the catalyst for immediate volume compression before terminal exit.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_6370a1.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 8: Structural Feature Linear Correlations
+\begin{frame}{7. Structural Feature Linear Correlations}
+  \begin{columns}
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Linear Trajectory Insights}
+        \begin{itemize}
+          \item \textbf{\texttt{eqpdays}} (Handset hardware age) holds the single highest positive correlation vector with churn (\textbf{+0.11}).
+          \item Physical device obsolescence acts as an external trigger for proactive competitor poaching.
+          \item Conversely, baseline parameters like \textbf{\texttt{hnd\_price}} show an inverse protective relationship (\textbf{$-0.10$}).
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63fef3.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 9: Lifecycle Tenure Pitfalls
+\begin{frame}{8. Structural Lifecycle Pitfalls: The Month 11 Shock}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63feeb.png}
+      \end{center}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{The Promotional Expiration Trap}
+        \begin{itemize}
+          \item Core tenure mapping isolates a massive, sudden defection spike reaching \alert{\textbf{$\sim 65\%$}} exactly between \textbf{months 11 and 12}.
+          \item This is a direct operational consequence of standard 12-month introductory contract discounts ending.
+          \item Automated transition to higher standard out-of-bundle rates causes bill shock, driving users to disconnect.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 10: Attrition Risk Across Revenue Strata
+\begin{frame}{9. Attrition Risk Across Revenue Strata}
+  \begin{columns}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Revenue Segment Profiling (\texttt{rev\_segment})}
+        \begin{itemize}
+          \item \textbf{Low Revenue Tier:} Registers the highest absolute churn footprint (\textbf{52.8\%}), indicating highly volatile, price-sensitive consumers.
+          \item \textbf{Premium \& High Tiers:} Retain a stable churn boundary near \textbf{48.7\%}.
+          \item \textbf{The Strategic Mandate:} Premium accounts require high-touch quality assurance; Low tiers require thin-margin cost optimization.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_63fed0.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 11: Advanced Insight IV - Premium Account Vulnerability
+\begin{frame}{10. Advanced Insight IV: Premium Account Bill Variance Sensitivity}
+  \begin{columns}
+    \begin{column}{0.48\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_637086.png}
+      \end{center}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Cross-Segment Billing Variance Tracking}
+        \begin{itemize}
+          \item Evaluating monthly variance reveals that churners in the \textbf{``Premium Accounts''} segment drop their variance to nearly \textbf{-\$2.2}.
+          \item This drop means high-value users cut back spending and drop out-of-bundle services before exiting.
+          \item Financial volatility inside premium brackets is a red flag for churn, requiring automated billing monitoring.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+file\end{frame}
+
+% Slide 12: Predictive Machine Learning (XGBoost)
+\begin{frame}{11. Predictive Machine Learning: XGBoost Core Engine}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Model Infrastructure \& Performance}
+        \begin{itemize}
+          \item \textbf{Model Architecture:} Scaled Gradient Boosting with built-in imbalance class correction.
+          \item \textbf{Core Performance Metric:} Achieved a solid \textbf{Overall Classification Accuracy of 63.00\%} across 25,000 unobserved test samples.
+          \item Balanced capabilities reflected in stable macro averages ($\text{Precision}=0.63$, $\text{Recall}=0.63$).
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth]{image_637bec.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% Slide 13: Technical Architecture Deployment Flow
+\begin{frame}{12. Predictive Operational Pipeline \& Topology}
+  \begin{block}{Transforming Predictive Power Into Operational Actions}
+    \begin{itemize}
+      \item \textbf{Step 1: Telemetry Batch Processing:} Continuous calculation of network performance (\texttt{call\_completion\_rate}) and financial drift (\texttt{change\_rev}).
+      \item \textbf{Step 2: Real-time XGBoost Scoring:} Running profiles through the boosting pipeline to output individual churn risk probabilities daily.
+      \item \textbf{Step 3: Automated Strategy Routing:} Flagging lines with risk thresholds $> 0.60$ for targeted retention campaigns.
+    \end{itemize}
+  \end{block}
+  \begin{exampleblock}{The Pipeline Advantage}
+    Leveraging the model's \textbf{63\% Accuracy} allows the business to transition from reactive support responses to automated preventive interventions.
+  \end{exampleblock}
+\end{frame}
+
+% Slide 14: The 3-Pillar Tactical Marketing Architecture
+\begin{frame}{13. The 3-Pillar Tactical Marketing Architecture}
+  \begin{block}{Pillar 1: Proactive Hardware Renewal Journey (\texttt{eqpdays} Intervention)}
+    Isolate continuous accounts where device age $> 365$ days (Validated as Top 1 Driver by XGBoost). Dispatch targeted hardware upgrade packages to secure a secondary 12-month tenure contract extension.
+  \end{block}
+  
+  \begin{block}{Pillar 2: Pre-Emptive Contract Transition Cushioning (\texttt{months} 11 Mitigation)}
+    Intercept the contract-end shock at Day 300. Automatically shift users into continuous loyalty tier bundles, smoothing out the discount expiration trap.
+  \end{block}
+
+  \begin{block}{Pillar 3: Behavioral Drop Radar Desk (\texttt{change\_mou} \& Network Link)}
+    Run automated 30-day monitoring. If usage falls into the Q1 drop category ($>120$ mins loss) or network quality indices drop, trigger outbound care retention calls immediately.
+  \end{block}
+\end{frame}
+
+% Slide 15: Expected Commercial Outcomes & Projections
+\begin{frame}{14. Expected Commercial Outcomes \& Projections}
+  \centering
+  \small
+  \begin{tabular}{lll}
+    \toprule
+    \textbf{Targeted Operational Lever} & \textbf{Proposed Tactical Action} & \textbf{Projected Financial Outcome} \\
+    \midrule
+    \textbf{Promo Contract Expiry} & Day 300 Continuity Transition & Compress contract-end churn by 25\% \\
+    \textbf{Device Age Obsolescence} & Subsidized hardware refresh bundles & Secures immediate 12-month tenure lock \\
+    \textbf{Silent Usage Drop} & Outbound technical care triggers & Recovers 8--12\% of high-value base \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.4cm}
+  \begin{exampleblock}{Conclusion}
+    Transitioning Company A from reactive operations to a structured behavioral warning architecture secures long-term market advantage, protects customer lifetime value, and optimizes net operating margins.
+  \end{exampleblock}
+\end{frame}
+
+\end{document}
